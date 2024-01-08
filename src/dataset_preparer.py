@@ -37,4 +37,5 @@ class DatasetPreparer:
         logging.info(f"Running dataset preparation for: {self.dataset_name}")
         self.download()
         self.merge()
+        self.clean()
         logging.info(f"Dataset preparation completed for: {self.dataset_name}")
