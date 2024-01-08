@@ -51,18 +51,47 @@ def merge_csv_files(input_pattern, output_filename):
     logging.info(f"Starting to merge files matching {input_pattern} into {output_filename}")
     
     headers_written = False
+    temp_output_filename = output_filename + '.tmp'
     
-    with open(output_filename, 'w', encoding='utf-8') as output_file:
-        for input_filename in glob.glob(input_pattern):
-            logging.info(f"Processing file: {input_filename}")
-            with open(input_filename, 'r', encoding='utf-8') as input_file:
-                for i, line in enumerate(input_file):
-                    if i == 0 and not headers_written:
-                        output_file.write(line)
-                        headers_written = True
-                    elif i > 0:
-                        output_file.write(line)
+    input_files = glob.glob(input_pattern)
+    if len(input_files) < 2:
+        logging.error("Need at least two files to merge.")
+        return
     
+    # Merge first two files
+    first_file, second_file = input_files[:2]
+    with open(first_file, 'r', encoding='utf-8') as f1, \
+         open(second_file, 'r', encoding='utf-8') as f2, \
+         open(temp_output_filename, 'w', encoding='utf-8') as output_file:
+        for line in f1:
+            output_file.write(line)
+        for i, line in enumerate(f2):
+            if i > 0:  # Skip header of the second file
+                output_file.write(line)
+    
+    # Delete the original files
+    os.remove(first_file)
+    os.remove(second_file)
+    
+    # Merge remaining files one by one
+    for input_filename in input_files[2:]:
+        with open(input_filename, 'r', encoding='utf-8') as input_file, \
+             open(temp_output_filename, 'r', encoding='utf-8') as temp_output_file, \
+             open(output_filename, 'w', encoding='utf-8') as final_output_file:
+            for line in temp_output_file:
+                final_output_file.write(line)
+            for i, line in enumerate(input_file):
+                if i > 0:  # Skip header
+                    final_output_file.write(line)
+        
+        # Delete the original file and the old temp file
+        os.remove(input_filename)
+        os.remove(temp_output_filename)
+        # Rename the new output file to be the temp file for the next iteration
+        os.rename(output_filename, temp_output_filename)
+    
+    # Rename the temp file to the final output file
+    os.rename(temp_output_filename, output_filename)
     logging.info(f"Merging complete. Output saved to {output_filename}")
 
 
