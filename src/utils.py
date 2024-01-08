@@ -111,7 +111,7 @@ def filter_and_write_lines(input_filename, output_filename):
          open(output_filename, 'w', encoding='utf-8') as output_file:
         csv_reader = csv.reader(input_file)
         for row in csv_reader:
-            if row[1] != 'rus':
+            if row[1].strip(' "\'') != 'rus':
                 text = '"' + row[0].strip('"') + '"'
                 output_file.write(text + '\n')
                 line_count += 1
