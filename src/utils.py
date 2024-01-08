@@ -46,27 +46,22 @@ def save_all_text_lines_to_file(input_filename, output_filename):
 
 
 def merge_csv_files(input_pattern, output_filename):
-    """Merge multiple CSV files into one large CSV file with low memory usage."""
+    """Merge multiple CSV files into one large file with low memory usage, without using CSV module."""
     
     logging.info(f"Starting to merge files matching {input_pattern} into {output_filename}")
     
-    with open(output_filename, 
-                'w', 
-                newline='', 
-                encoding='utf-8') as output_file:
-        
-        writer = None
-        
+    headers_written = False
+    
+    with open(output_filename, 'w', encoding='utf-8') as output_file:
         for input_filename in glob.glob(input_pattern):
             logging.info(f"Processing file: {input_filename}")
-            with open(input_filename, 'r', newline='', encoding='utf-8') as input_file:
-                reader = csv.reader(input_file)
-                if writer is None:
-                    writer = csv.writer(output_file)
-                    headers = next(reader)
-                    writer.writerow(headers)
-                for row in reader:
-                    writer.writerow(row)
+            with open(input_filename, 'r', encoding='utf-8') as input_file:
+                for i, line in enumerate(input_file):
+                    if i == 0 and not headers_written:
+                        output_file.write(line)
+                        headers_written = True
+                    elif i > 0:
+                        output_file.write(line)
     
     logging.info(f"Merging complete. Output saved to {output_filename}")
 
