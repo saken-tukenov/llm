@@ -48,6 +48,14 @@ class DatasetPreparer:
         merged_file = f"{self.dataset_dir}{self.dataset_name}.csv"
         utils.merge_csv_files(f"{self.dataset_dir}*.csv", merged_file)
         logging.info("Merge completed for dataset: %s", self.dataset_name)
+
+    def filter(self):
+        """Filter the merged dataset file by removing lines with the 'rus' language."""
+        logging.info("Starting filtering of dataset: %s", self.dataset_name)
+        filtered_file = f"{self.dataset_dir}{self.dataset_name}_filtered.csv"
+        utils.filter_and_write_lines(f"{self.dataset_dir}{self.dataset_name}.csv", filtered_file)
+        logging.info("Filtering completed for dataset: %s", self.dataset_name)
+
     def clean(self):
         """Clean the merged dataset file by removing unnecessary content."""
         logging.info("Starting cleaning of dataset: %s", self.dataset_name)
@@ -57,9 +65,10 @@ class DatasetPreparer:
         logging.info("Cleaning completed for dataset: %s", self.dataset_name)
 
     def run(self):
-        """Run the dataset preparation process: download, merge, and clean the dataset."""
+        """Run the dataset preparation process: download, merge, filter, and clean the dataset."""
         logging.info("Running dataset preparation for: %s", self.dataset_name)
         self.download()
         self.merge()
+        self.filter()
         self.clean()
         logging.info("Dataset preparation completed for: %s", self.dataset_name)
