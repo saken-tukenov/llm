@@ -127,7 +127,6 @@ def show_unique_characters_in_file(filename):
     logging.info(''.join(sorted(unique_characters)))
 
 
-
 def clean_file_contents(input_filename, output_filename):
     """Clean the file contents by allowing only specified characters."""
     
@@ -140,16 +139,19 @@ def clean_file_contents(input_filename, output_filename):
         char_count = 0
         for line in input_file:
             cleaned_line = ''.join(filter(allowed_chars.__contains__, line))
-            output_file.write(cleaned_line)
+            if cleaned_line:  # Write only non-empty lines to save HDD space
+                output_file.write(cleaned_line)
+                char_count += len(cleaned_line)
             line_count += 1
-            char_count += len(cleaned_line)
-            logging.info(f"Processed {line_count} lines and {char_count} characters...")
-    logging.info("\nCleaning complete. The cleaned contents have been saved.")
+            if line_count % 1000 == 0:  # Log progress every 1000 lines to reduce I/O operations
+                logging.info(f"Processed {line_count} lines and {char_count} characters...")
+    logging.info(f"\nCleaning complete. Processed {line_count} lines and {char_count} characters in total.")
+    logging.info(f"The cleaned contents have been saved to {output_filename}")
     
-    # Delete the source file to save HDD space
-    os.remove(input_filename)
-    logging.info(f"Deleted the source file: {input_filename}")
-
+    # Instead of deleting the source file, rename it as a backup
+    backup_filename = input_filename + '.bak'
+    os.rename(input_filename, backup_filename)
+    logging.info(f"Renamed the source file to: {backup_filename}")
 
 
 def compress_file(input_filename, output_filename):
