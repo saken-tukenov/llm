@@ -27,6 +27,11 @@ class DatasetPreparer:
         logging.info(f"Starting merge of CSV files in {self.dataset_dir}")
         utils.merge_csv_files(f"{self.dataset_dir}*.csv", f"{self.dataset_dir}{self.dataset_name}.csv")
         logging.info(f"Merge completed for dataset: {self.dataset_name}")
+    
+    def clean(self):
+        logging.info(f"Starting cleaning of dataset: {self.dataset_name}")
+        utils.clean_file_contents(f"{self.dataset_dir}{self.dataset_name}.csv", f"{self.dataset_dir}{self.dataset_name}.txt")
+        logging.info(f"Cleaning completed for dataset: {self.dataset_name}")
 
     def run(self):
         logging.info(f"Running dataset preparation for: {self.dataset_name}")

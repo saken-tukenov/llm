@@ -145,6 +145,10 @@ def clean_file_contents(input_filename, output_filename):
             char_count += len(cleaned_line)
             logging.info(f"Processed {line_count} lines and {char_count} characters...")
     logging.info("\nCleaning complete. The cleaned contents have been saved.")
+    
+    # Delete the source file to save HDD space
+    os.remove(input_filename)
+    logging.info(f"Deleted the source file: {input_filename}")
 
 
 
