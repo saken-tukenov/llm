@@ -109,10 +109,10 @@ def filter_and_write_lines(input_filename, output_filename):
     line_count = 0
     with open(input_filename, 'r', encoding='utf-8') as input_file, \
          open(output_filename, 'w', encoding='utf-8') as output_file:
-        csv_reader = csv.reader(input_file)
-        for row in csv_reader:
-            if row[1].strip(' "\'') != 'rus':
-                text = '"' + row[0].strip('"') + '"'
+        for line in input_file:
+            columns = line.split(',')
+            if len(columns) > 1 and columns[1].strip(' "\'') != 'rus':
+                text = '"' + columns[0].strip('"') + '"'
                 output_file.write(text + '\n')
                 line_count += 1
     logging.info("Filtered and wrote %d lines excluding Russian language entries.", line_count)
