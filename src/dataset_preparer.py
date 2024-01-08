@@ -13,7 +13,9 @@ class DatasetPreparer:
         os.makedirs(self.dataset_dir, exist_ok=True)
         for file_url in self.files:
             filename = file_url.split('/')[-1]
-            utils.download_file(file_url, f"{self.dataset_dir}{filename}")
+            filepath = f"{self.dataset_dir}{filename}"
+            if not os.path.isfile(filepath) or os.path.getsize(filepath) == 0:
+                utils.download_file(file_url, filepath)
 
     def merge(self):
         utils.merge_csv_files(f"{self.dataset_dir}*.csv", f"{self.dataset_dir}{self.dataset_name}.csv")
