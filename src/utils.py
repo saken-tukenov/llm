@@ -97,26 +97,22 @@ def merge_csv_files(input_pattern, output_filename):
 
 
 
+import dask.dataframe as dd
+
 def filter_and_write_lines(input_filename, output_filename):
     """
-    Read lines from a CSV file, filter out rows where the second column is 'rus',
+    Read lines from a CSV file using Dask, filter out rows where the second column is 'rus',
     and write the remaining lines to an output file.
 
     Args:
         input_filename (str): The name of the input CSV file.
         output_filename (str): The name of the output file where the filtered lines will be written.
     """
-    line_count = 0
-    with open(input_filename, 'r', encoding='utf-8') as input_file, \
-         open(output_filename, 'w', encoding='utf-8') as output_file:
-        for line in input_file:
-            columns = line.split(',')
-            if len(columns) > 1 and columns[1].strip(' "\'') != 'rus':
-                text = '"' + columns[0].strip('"') + '"'
-                output_file.write(text + '\n')
-                line_count += 1
+    ddf = dd.read_csv(input_filename, assume_missing=True)
+    filtered_ddf = ddf[ddf.iloc[:, 1] != 'rus']
+    filtered_ddf.to_csv(output_filename, single_file=True, index=False)
+    line_count = filtered_ddf.shape[0].compute()
     logging.info("Filtered and wrote %d lines excluding Russian language entries.", line_count)
-
 
 
 def show_unique_characters_in_file(filename):
