@@ -97,21 +97,22 @@ def merge_csv_files(input_pattern, output_filename):
 
 
 
-import dask.dataframe as dd
+
+import vaex
 
 def filter_and_write_lines(input_filename, output_filename):
     """
-    Read lines from a CSV file using Dask, filter out rows where the second column is 'rus',
+    Read lines from a CSV file using Vaex, filter out rows where the second column is 'rus',
     and write the remaining lines to an output file.
 
     Args:
         input_filename (str): The name of the input CSV file.
         output_filename (str): The name of the output file where the filtered lines will be written.
     """
-    ddf = dd.read_csv(input_filename, assume_missing=True)
-    filtered_ddf = ddf[ddf.iloc[:, 1] != 'rus']
-    filtered_ddf.to_csv(output_filename, single_file=True, index=False)
-    line_count = filtered_ddf.shape[0].compute()
+    df = vaex.open(input_filename)
+    filtered_df = df[df.iloc[:, 1] != 'rus']
+    filtered_df.export_csv(output_filename, index=False)
+    line_count = len(filtered_df)
     logging.info("Filtered and wrote %d lines excluding Russian language entries.", line_count)
 
 
