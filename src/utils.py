@@ -2,7 +2,6 @@
 
 
 import logging
-import csv
 import glob
 import gzip
 import os
@@ -97,23 +96,27 @@ def merge_csv_files(input_pattern, output_filename):
 
 
 
-
-import vaex
-
 def filter_and_write_lines(input_filename, output_filename):
     """
-    Read lines from a CSV file using Vaex, filter out rows where the second column is 'rus',
-    and write the remaining lines to an output file.
+    Read lines from a CSV file, filter out rows where the second column is 'rus',
+    and write the first column (without quotes) to an output file.
 
     Args:
         input_filename (str): The name of the input CSV file.
         output_filename (str): The name of the output file where the filtered lines will be written.
     """
-    df = vaex.open(input_filename)
-    filtered_df = df[df.iloc[:, 1] != 'rus']
-    filtered_df.export_csv(output_filename, index=False)
-    line_count = len(filtered_df)
-    logging.info("Filtered and wrote %d lines excluding Russian language entries.", line_count)
+    with open(input_filename, 'r', encoding='utf-8') as input_file, \
+         open(output_filename, 'w', encoding='utf-8') as output_file:
+        header = input_file.readline()
+        output_file.write(header.strip('"').replace('""', '') + '\n')  # Remove quotes from header
+        line_count = 0
+        for line in input_file:
+            columns = line.split(',')
+            if columns[1].strip() == 'kaz':
+                first_column = columns[0].strip('"')  # Remove quotes from the first column
+                output_file.write(f'{first_column}\n')
+                line_count += 1
+    logging.info("Filtered and wrote %d lines excluding 'rus' language entries.", line_count)
 
 
 def show_unique_characters_in_file(filename):
