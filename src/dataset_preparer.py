@@ -68,7 +68,7 @@ class DatasetPreparer:
         """Run the dataset preparation process: download, merge, filter, and clean the dataset."""
         logging.info("Running dataset preparation for: %s", self.dataset_name)
         self.download()
-        self.merge()
+        # self.merge()
         self.filter()
         self.clean()
         logging.info("Dataset preparation completed for: %s", self.dataset_name)
