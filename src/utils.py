@@ -95,27 +95,36 @@ def merge_csv_files(input_pattern, output_filename):
     logging.info("Merging complete. Output saved to %s", output_filename)
 
 
+import pandas as pd
 
 def filter_and_write_lines(input_filename, output_filename):
     """
     Read lines from a CSV file, filter out rows where the second column is 'rus',
-    and write the first column (without quotes) to an output file.
+    and write the first column (without quotes) to an output file using pandas DataFrame.
+    This function is optimized for large files with low memory usage.
 
     Args:
         input_filename (str): The name of the input CSV file.
         output_filename (str): The name of the output file where the filtered lines will be written.
     """
-    with open(input_filename, 'r', encoding='utf-8') as input_file, \
-         open(output_filename, 'w', encoding='utf-8') as output_file:
-        header = input_file.readline()
-        output_file.write(header.strip('"').replace('""', '') + '\n')  # Remove quotes from header
-        line_count = 0
-        for line in input_file:
-            columns = line.split(',')
-            if columns[1].strip() == 'kaz':
-                first_column = columns[0].strip('"')  # Remove quotes from the first column
-                output_file.write(f'{first_column}\n')
-                line_count += 1
+    # Define chunk size for reading large files in chunks
+    chunk_size = 10000
+
+    # Initialize a variable to keep track of the number of lines written
+    line_count = 0
+
+    # Process the CSV in chunks
+    for chunk in pd.read_csv(input_filename, chunksize=chunk_size, dtype=str):
+        # Filter out rows where the second column (predicted_language) is 'rus'
+        filtered_chunk = chunk[chunk['predicted_language'] != 'rus']
+
+        # Write the first column (text) to the output file, without quotes
+        # Append to the file if it already exists, otherwise create a new file
+        filtered_chunk['text'].str.strip('"').to_csv(output_filename, mode='a', index=False, header=False)
+
+        # Update the line count
+        line_count += filtered_chunk.shape[0]
+
     logging.info("Filtered and wrote %d lines excluding 'rus' language entries.", line_count)
 
 
