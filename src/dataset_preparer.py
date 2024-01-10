@@ -51,9 +51,9 @@ class DatasetPreparer:
 
     def filter(self):
         """Filter the merged dataset file by removing lines with the 'rus' language."""
-        logging.info("Starting filtering of dataset: %s", self.dataset_name)
-        filtered_file = f"{self.dataset_dir}{self.dataset_name}_filtered.csv"
-        utils.filter_and_write_lines(f"{self.dataset_dir}{self.dataset_name}.csv", filtered_file)
+        logging.info("Starting filtering of dataset: %s", self.filename)
+        filtered_file = f"{self.dataset_dir}{self.filename}_filtered.csv"
+        utils.filter_and_write_lines(f"{self.dataset_dir}{self.filename}.csv", filtered_file)
         logging.info("Filtering completed for dataset: %s", self.dataset_name)
 
     def clean(self):
