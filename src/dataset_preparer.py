@@ -22,6 +22,7 @@ class DatasetPreparer:
         self.dataset_name = dataset_name
         self.files = files
         self.dataset_dir = f"data/{self.dataset_name}/"
+        self.filename = self.files[0].split('/')[-1].split('.')[0]
         logging.basicConfig(level=logging.INFO)
 
     def download(self):
